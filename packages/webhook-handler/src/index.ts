@@ -19,6 +19,9 @@ interface NotionEvent {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    if (request.method === "GET" && new URL(request.url).pathname === "/healthz") {
+      return Response.json({ ok: true, service: "flowsync-webhook" });
+    }
     if (request.method === "GET") {
       return new Response("FlowSync webhook OK\n", { status: 200 });
     }
