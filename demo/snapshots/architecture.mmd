@@ -1,0 +1,39 @@
+flowchart TD
+  subgraph Clients["🧑‍💻 Clients"]
+    direction LR
+    cli["🖥️ @flowsync/cli"]
+    github_action["⚙️ @flowsync/github-action"]
+    web["🖼️ @flowsync/web"]
+    cli_py["🐍 notion-flowsync (py)"]
+  end
+  subgraph Workers["☁️ Workers"]
+    direction LR
+    agent_tools["🤖 @flowsync/agent-tools"]
+    webhook_handler["🔗 @flowsync/webhook-handler"]
+  end
+  subgraph Core["📦 Core"]
+    direction LR
+    core["📦 @flowsync/core"]
+  end
+  subgraph External["🌐 External"]
+    direction LR
+    GitHub["🐙 GitHub"]
+    Notion["📝 Notion API"]
+  end
+  agent_tools --> core
+  cli --> core
+  github_action --> core
+  web --> core
+  cli_py -.->|mirrors| cli
+  cli ==>|calls| GitHub
+  core ==>|calls| Notion
+  github_action ==>|calls| GitHub
+  webhook_handler ==>|calls| GitHub
+  classDef cls fill:#3a2f1f,stroke:#e0c47e,stroke-width:2px,color:#e8e8ea
+  classDef wkr fill:#1f3a2a,stroke:#7ee0a2,stroke-width:2px,color:#e8e8ea
+  classDef core fill:#1f3a5f,stroke:#7ab8ff,stroke-width:2px,color:#e8e8ea
+  classDef ext fill:#2a2a30,stroke:#9a9aa2,stroke-width:2px,color:#e8e8ea
+  class cli,github_action,web,cli_py cls
+  class agent_tools,webhook_handler wkr
+  class core core
+  class GitHub,Notion ext

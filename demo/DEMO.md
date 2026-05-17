@@ -12,6 +12,7 @@ nothing at all (no internet). Always have Tier 2 + 3 ready before you present.
 | Notion workspace page | https://www.notion.so/Flowsync-363b98e7d08180ffa42ff53fe0a09ee7 |
 | Changelog row v0.2.0 (rich: 2 feat / 2 fix) | https://www.notion.so/v0-2-0-363b98e7d0818193913eedb3ce4885a9 |
 | Changelog row v0.1.0 | https://www.notion.so/v0-1-0-363b98e7d08181a29edcceca5dc23b37 |
+| **Architecture diagram (rendered Mermaid)** | https://www.notion.so/FlowSync-Architecture-363b98e7d08181159a26c8e44a40fbe7 |
 | GitHub repo | https://github.com/Kush614/Flowsync |
 | GitHub Actions history (green runs) | https://github.com/Kush614/Flowsync/actions |
 | **Published release (from a Notion Status flip)** | https://github.com/Kush614/Flowsync/releases/tag/v0.1.0 |
@@ -39,6 +40,12 @@ Story (3 min):
    existing release *is* the proof; speak to it in past tense.)
 5. Close: "Code writes the docs. The docs ship the code. Every piece runs on
    the Notion Developer Platform."
+
+**Architecture-diagram beat (strong visual):** open the Architecture page —
+the Mermaid block renders as a styled, color-coded system diagram. "FlowSync
+drew this from the real package graph." Then: `notion-sync arch scaffold
+--page <id> --out ./prototype` → "and it reads a diagram back into a code
+skeleton." Design ⇄ code, both ways.
 
 To generate a *fresh* live changelog row on stage (optional flex):
 ```

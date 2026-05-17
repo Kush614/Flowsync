@@ -95,6 +95,7 @@ FlowSync is two-way. Highlights below; full list in `docs/COLLAB-FEATURES.md`.
 - **Notion AI Q&A** — once the docs are in Notion, ask "what shipped in v1.4?" instead of pinging engineers.
 - **Linear ticket relations** — `ENG-1234` in commit messages flows to a Linear Tickets property.
 - **Custom Agent tools** — `generate_changelog`, `publish_release`, `sync_api_reference`, `query_release` callable from any agent.
+- **Architecture diagram sync (bidirectional)** — `notion-sync arch push` scans the package graph and writes a styled, color-coded Mermaid diagram into Notion that renders as a live diagram; `notion-sync arch scaffold` reads a diagram drawn in Notion and generates a prototype code skeleton (folders, stubs, wired deps). Design in Notion → code, or code → design doc.
 
 ## Demo arc (Sunday 3:30 PM)
 
