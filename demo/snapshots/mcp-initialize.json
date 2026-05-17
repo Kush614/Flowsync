@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":"2025-06-18","capabilities":{"tools":{"listChanged":false}},"serverInfo":{"name":"flowsync-agent-tools","version":"0.1.0"},"instructions":"FlowSync tools: generate a changelog from a GitHub repo, publish a release from a Notion page, sync an OpenAPI spec, or query a release. All write into the connected Notion workspace."}}
