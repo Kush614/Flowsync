@@ -41,7 +41,10 @@ async function nt<T = any>(path: string, method = "GET", body?: unknown): Promis
 	const r = await fetch(`https://api.notion.com/v1${path}`, {
 		method,
 		headers: {
-			Authorization: `Bearer ${need("NOTION_API_TOKEN")}`,
+			// Custom-Agent invocations override NOTION_API_TOKEN with the
+			// agent's own integration. Pin to our Flowsync integration via a
+			// non-reserved var so the tool always has DB access.
+			Authorization: `Bearer ${need("FLOWSYNC_NOTION_TOKEN")}`,
 			"Notion-Version": "2022-06-28",
 			"Content-Type": "application/json",
 		},
