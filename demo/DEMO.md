@@ -1,5 +1,22 @@
 # FlowSync — demo runbook & fallback ladder
 
+## ⭐ Opener (strongest) — PM ships via a Notion Custom Agent
+
+A Custom Agent in Notion is wired to the deployed `flowsync-agent-tools`
+Worker. Open the agent chat and type, in plain English:
+
+> **"Generate a changelog for angular/angular v21.2.13 from v21.2.12."**
+
+The agent invokes the `generate_changelog` tool — running on Notion's
+cloud — and the changelog page updates. A non-technical PM just shipped a
+doc by chatting. Follow-up: **"What shipped in v21.2.0?"** → `query_release`.
+
+Backend is verified independently via `ntn workers exec` (see below) — if
+the agent ever mis-routes on stage, fall straight to that command and
+narrate it as "the exact tool the agent calls." Never debug the agent live.
+
+---
+
 The demo has **3 tiers**. Tier 1 needs nothing but a browser. Tier 3 needs
 nothing at all (no internet). Always have Tier 2 + 3 ready before you present.
 

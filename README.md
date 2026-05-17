@@ -8,7 +8,7 @@ Built for the Notion Developer Platform Hackathon, May 2026.
 
 ## TL;DR for judges
 
-- **Genuinely deployed on Notion Workers.** Worker `flowsync-agent-tools` (`019e373b-265f-7394-837f-f458f6f3fa2c`), 4 agent tools, **remote `ntn workers exec` verified** (not `--local`) — runs in Notion's cloud sandbox.
+- **Genuinely deployed on Notion Workers, driven by a Custom Agent.** Worker `flowsync-agent-tools` (`019e373b-265f-7394-837f-f458f6f3fa2c`), 4 agent tools, **remote `ntn workers exec` verified** (not `--local`) — runs in Notion's cloud sandbox. The tools are attached to a Notion Custom Agent: a PM ships a changelog by chatting in plain English.
 - **Bidirectional, proven on real data.** An agent tool reads Google's Angular releases from GitHub and writes structured changelogs into Notion; a Notion **Status flip publishes a real GitHub release** (v0.1.0 via webhook, v0.2.0 via the agent's `publish_release`).
 - **We didn't just use the platform — we hardened it.** We found, root-caused, and filed **four real issues** in the day-one CLI/platform while building this. See [Platform feedback](#platform-feedback--four-issues-we-found-and-filed).
 
@@ -27,6 +27,7 @@ Engineering docs rot because humans maintain them by hand, next to code that nev
 | Platform capability | How FlowSync uses it | Status |
 |---|---|---|
 | **Notion Workers** | `packages/ntn-agent-tools` — `@notionhq/workers` SDK, 4 `worker.tool()` capabilities, deployed via `ntn workers deploy`, secrets via `ntn workers env push`. | ✅ Deployed, remote-exec verified |
+| **Custom Agent** | The deployed Worker's tools are attached to a Notion Custom Agent — a PM chats *"generate a changelog for angular/angular v21.2.13"* and the tool runs on Notion's cloud. | ✅ Wired (tools backend verified) |
 | **Webhooks** | `packages/webhook-handler` — HMAC-verified handler; a Notion `page.properties_updated` event (Status → "Approved for release") publishes a GitHub release. | ✅ Working (published v0.1.0) |
 | **MCP server** | `packages/agent-tools` — spec-compliant JSON-RPC 2.0 (`initialize` / `tools/list` / `tools/call`); same protocol Claude Code / Cursor speak. | ✅ Working |
 | **Notion API** | Databases, blocks, **rendered Mermaid diagrams**, page hierarchy for the changelog / API-reference / data-dictionary / hub / architecture surfaces. | ✅ Working |
