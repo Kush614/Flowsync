@@ -173,7 +173,7 @@ export class ChangelogUpserter {
           { type: "mention", mention: { type: "user", user: { id: lead } } } as never,
           { type: "text", text: { content: " before release." } }
         ],
-        icon: { type: "emoji", emoji: "warning" as never }
+        icon: { type: "emoji", emoji: "⚠️" as never }
       }
     };
   }

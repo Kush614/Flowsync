@@ -44,11 +44,22 @@ export const blocks = {
     type: "code",
     code: { rich_text: rt(text), language: language as never }
   }),
-  callout: (text: string, emoji: string = "info"): BlockObjectRequest => ({
-    object: "block",
-    type: "callout",
-    callout: { rich_text: rt(text), icon: { type: "emoji", emoji: emoji as never } }
-  }),
+  callout: (text: string, emoji: string = "info"): BlockObjectRequest => {
+    const EMOJI: Record<string, string> = {
+      info: "ℹ️",
+      rocket: "🚀",
+      warning: "⚠️",
+      check: "✅",
+      bug: "🐛",
+      sparkles: "✨"
+    };
+    const icon = EMOJI[emoji] ?? (emoji.length <= 4 ? emoji : "ℹ️");
+    return {
+      object: "block",
+      type: "callout",
+      callout: { rich_text: rt(text), icon: { type: "emoji", emoji: icon as never } }
+    };
+  },
   divider: (): BlockObjectRequest => ({
     object: "block",
     type: "divider",
