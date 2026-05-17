@@ -39,12 +39,24 @@ export default {
       return Response.json({ challenge: body.challenge });
     }
 
+    if ((body as { verification_token?: string }).verification_token) {
+      const token = (body as { verification_token: string }).verification_token;
+      console.log("=================================================");
+      console.log("[NOTION VERIFICATION TOKEN]");
+      console.log(token);
+      console.log("Paste this back into the Notion integration UI.");
+      console.log("=================================================");
+      return Response.json({ ok: true });
+    }
+
     const valid = await verifyNotionSignature(
       env.NOTION_WEBHOOK_VERIFICATION_TOKEN,
       rawBody,
       request.headers.get("X-Notion-Signature")
     );
     if (!valid) return new Response("invalid signature", { status: 401 });
+
+    console.log("[EVENT] type=" + body.type + " entity=" + JSON.stringify(body.entity ?? {}) + " data=" + JSON.stringify(body.data ?? {}).slice(0, 200));
 
     if (!isWatchedDatabase(env, body)) {
       return Response.json({ ok: true, skipped: "database not watched" });
@@ -54,11 +66,13 @@ export default {
       switch (body.type) {
         case "page.properties_updated":
         case "page.content_updated":
-        case "page.updated":
-          if (await statusFlippedToApproved(env, body)) {
-            return await handleReleaseApproval(env, body);
-          }
+        case "page.updated": {
+          const result = await handleReleaseApproval(env, body);
+          const cloned = result.clone();
+          const peek = await cloned.text();
+          if (peek.includes("release_created")) return result;
           return await handleEditBack(env, body);
+        }
 
         case "comment.created":
           return await handleCommentForwarded(env, body as never);
