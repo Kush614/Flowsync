@@ -1,118 +1,117 @@
-# Notion FlowSync
+# 🔁 FlowSync
 
-> Engineering-specific documentation sync for Notion. Built on the Notion Developer Platform (Workers, Custom Agents, External Agent API, CLI) that shipped May 14, 2026.
+**Code writes the docs. The docs ship the code. Both directions, automatically — on the Notion Developer Platform.**
 
-## The pitch in one paragraph
+Built for the Notion Developer Platform Hackathon, May 2026.
 
-Notion's new database sync handles "pull any API into a Notion DB." Useful — but it doesn't know what a *git commit* is, can't parse OpenAPI schemas, doesn't understand semantic-commit categories, and doesn't speak Prisma migrations. FlowSync fills exactly that gap: an opinionated, engineering-native sync layer that turns commits, API specs, and migrations into structured Notion docs — and exposes those operations as Custom Agent tools so "ship v1.5" becomes a chat message, not a CLI ritual.
+---
 
-Built for the **Notion Developer Platform Hackathon**, May 16–17, 2026.
+## TL;DR for judges
 
-## How FlowSync uses the Notion Developer Platform
+- **Genuinely deployed on Notion Workers.** Worker `flowsync-agent-tools` (`019e373b-265f-7394-837f-f458f6f3fa2c`), 4 agent tools, **remote `ntn workers exec` verified** (not `--local`) — runs in Notion's cloud sandbox.
+- **Bidirectional, proven on real data.** An agent tool reads Google's Angular releases from GitHub and writes structured changelogs into Notion; a Notion **Status flip publishes a real GitHub release** (v0.1.0 via webhook, v0.2.0 via the agent's `publish_release`).
+- **We didn't just use the platform — we hardened it.** We found, root-caused, and filed **four real issues** in the day-one CLI/platform while building this. See [Platform feedback](#platform-feedback--four-issues-we-found-and-filed).
 
-| Platform primitive (May 14 announcement) | FlowSync surface | What it does |
+---
+
+## What it is
+
+Engineering docs rot because humans maintain them by hand, next to code that never stops. FlowSync makes the **code the source of truth** and **Notion a two-way control surface**:
+
+- **Code → Notion** — conventional-commit changelogs, OpenAPI → API Reference DB, Prisma schema → Data Dictionary, package graph → a rendered architecture diagram.
+- **Notion → code** — flip a release `Status` and a GitHub release publishes; an agent calls a tool and ships.
+- **Any agent** — exposed as a deployed Notion Worker *and* a spec-compliant MCP server, so a Notion Custom Agent, Claude Code, Cursor, or Codex can drive the workspace.
+
+## How it uses the Notion Developer Platform
+
+| Platform capability | How FlowSync uses it | Status |
 |---|---|---|
-| **Notion Workers** (sandboxed code, no infra) | `packages/webhook-handler`, `packages/agent-tools` | Deploys via `notion workers deploy`. No external infra. |
-| **Database sync** (generic) | `packages/core` | Engineering-specific layer on top: commit parsing, AST-based schema reading, OpenAPI introspection. |
-| **Custom Agent tools** | `packages/agent-tools` | Exposes `generate_changelog`, `publish_release`, `sync_api_reference`, `query_release` as MCP-style tools any Notion agent can call. |
-| **External Agent API** (Claude Code, Cursor, Codex, Decagon) | `packages/agent-tools` | Same tool surface — external agents attach the manifest and call FlowSync from any IDE or chat. |
-| **Webhooks** | `packages/webhook-handler` | Signature-verified HTTP handler; routes status flips, comments, and edits back to GitHub. |
-| **Notion CLI** | `packages/cli`, `cli-py/` | Local equivalents for engineers who'd rather run `notion-sync push` than wait for an agent. |
+| **Notion Workers** | `packages/ntn-agent-tools` — `@notionhq/workers` SDK, 4 `worker.tool()` capabilities, deployed via `ntn workers deploy`, secrets via `ntn workers env push`. | ✅ Deployed, remote-exec verified |
+| **Webhooks** | `packages/webhook-handler` — HMAC-verified handler; a Notion `page.properties_updated` event (Status → "Approved for release") publishes a GitHub release. | ✅ Working (published v0.1.0) |
+| **MCP server** | `packages/agent-tools` — spec-compliant JSON-RPC 2.0 (`initialize` / `tools/list` / `tools/call`); same protocol Claude Code / Cursor speak. | ✅ Working |
+| **Notion API** | Databases, blocks, **rendered Mermaid diagrams**, page hierarchy for the changelog / API-reference / data-dictionary / hub / architecture surfaces. | ✅ Working |
+| **`ntn` CLI** | `login`, `workers new/deploy/env/exec`, `doctor` — the full deploy + remote-exec loop. | ✅ Working (1 Windows bug filed) |
 
-## What's in the box
+### Live proof
 
-| Package | What it does |
-|---|---|
-| `@flowsync/core` | Notion client, block builders, upserters (changelog, API reference, data dictionary), people-map, synced blocks. |
-| `@flowsync/github-action` | On `v*` tag push, parses commits and upserts a Changelog row. |
-| `@flowsync/cli` (TS) | `notion-sync push` / `openapi` / `migrations`. |
-| `notion-flowsync` (Python) | Sibling CLI mirroring `push` for Python-heavy repos. |
-| `@flowsync/webhook-handler` | Notion Worker for bidirectional flows: release approval, comment forwarding, edit-back. |
-| `@flowsync/agent-tools` | Notion Worker exposing FlowSync as Custom Agent tools. |
+- **Overview (start here):** https://www.notion.so/FlowSync-Project-Overview-363b98e7d08181758251f2a7ba3a71c7
+- **Real Angular v21.2.0 changelog** (19 features / 29 fixes, real engineers + PRs): https://www.notion.so/v21-2-0-363b98e7d08181bfa89cd3981f8d72ec
+- **Engineering Hub:** https://www.notion.so/Platform-Engineering-Hub-363b98e7d08181f8a305e382748a8e97
+- **Rendered architecture diagram:** https://www.notion.so/FlowSync-Architecture-363b98e7d08181159a26c8e44a40fbe7
+- **GitHub releases published from Notion:** https://github.com/Kush614/Flowsync/releases (`v0.1.0`, `v0.2.0`)
 
-## What FlowSync does that native Notion sync does not
+---
 
-| Capability | Native Notion DB sync | FlowSync |
-|---|---|---|
-| Pull rows from Postgres/Salesforce/Zendesk | yes | — |
-| Categorize commits by conventional-commits + breaking | — | yes |
-| Parse an OpenAPI spec into per-endpoint Notion rows | — | yes |
-| Parse a Prisma schema → data dictionary | — | yes |
-| `@mention` the breaking-change lead automatically | — | yes |
-| Extract Linear ticket IDs from commit messages | — | yes |
-| Forward Notion comments to the matching GitHub PR | — | yes |
-| Publish a GitHub release from a Notion status flip | — | yes |
-| Expose all of the above as Custom Agent tools | — | yes |
+## Platform feedback — four issues we found and filed
 
-FlowSync is built **on top of** the platform, not against it. Where the native sync makes sense (e.g., pulling customer data from Salesforce into a Customers DB so FlowSync can relate releases to customers), FlowSync depends on it.
+Building on the day-one platform surfaced four concrete defects. Each is reported with a root cause and a suggested fix — this is real platform feedback, not bug-hunting for its own sake.
+
+### 1. `ntn workers exec --local` is broken on Windows
+`os error 193: %1 is not a valid Win32 application`. The CLI spawns `tsx` by bare name; on Windows the npm shim is `tsx.cmd` (not a PE binary), so `CreateProcess` returns `ERROR_BAD_EXE_FORMAT`.
+**Fix:** on Windows, invoke via `cmd.exe /C`, resolve the `.cmd` shim, or run tsx's JS entry with `node`. **Impact:** blocks the entire documented local dev/test loop on Windows. Cloud deploy + remote exec are unaffected.
+
+### 2. `ntn login` 403 is opaque under workspace governance
+`403 Forbidden — "Personal access token capabilities exceed what workspace governance allows."` A governance policy silently blocks the Workers token. The error gives no hint which setting or how to resolve it.
+**Fix:** surface the specific governance policy and the admin action needed; document that Workers require token capabilities a governed workspace may restrict.
+
+### 3. `NOTION_` is a reserved env-var prefix — discovered only by failure
+`ntn workers env push` → `400 InvalidSecretError: Environment variable name must not start with "NOTION_"`. Cost a full deploy cycle. (`NOTION_API_TOKEN` is the one allowed exception.)
+**Fix:** document the reserved prefix in the `workers env` help/output and validate names client-side before the round trip.
+
+### 4. Injected `context.notion` doesn't match the documented client
+The scaffold docs state `context.notion` is a `@notionhq/client` instance, but in a deployed tool it lacks `databases.query` (`notion.databases.query is not a function`). The runtime client appears data-source-based.
+**Fix / workaround:** align the injected client with the documented SDK shape, or document the data-source API. FlowSync works around it with raw REST + `NOTION_API_TOKEN`.
+
+---
+
+## Repo layout
+
+```
+packages/
+  core/            @flowsync/core — Notion client, block builders, upserters, arch (mermaid gen/parse)
+  github-action/   on v* tag push → upsert a Changelog row
+  cli/             notion-sync: push | openapi | migrations | arch | init
+  webhook-handler/ Notion webhook → GitHub (release approval, comment forward, edit-back)
+  agent-tools/     spec-compliant MCP server (JSON-RPC) — 4 tools
+  ntn-agent-tools/ DEPLOYED Notion Worker (@notionhq/workers) — same 4 tools
+cli-py/            Python sibling CLI
+demo/              offline demo mode (zero-internet) + DEMO.md runbook + snapshots
+docs/              ARCHITECTURE / DATABASE-SETUP / COLLAB-FEATURES / CLI-SETUP
+```
 
 ## Quick start
 
-```powershell
-npm install
-npm run build
-Copy-Item .env.example .env
-# edit .env with NOTION_TOKEN and DB IDs
-```
-
-Set up the three Notion databases per `docs/DATABASE-SETUP.md`. Then:
-
-### Local CLI
-```powershell
+```bash
+npm install && npm run build
+cp .env.example .env          # add NOTION_TOKEN + DB IDs
+node packages/cli/dist/index.js init --parent <notion-page-id>   # creates the 3 DBs
 node packages/cli/dist/index.js push --tag v0.1.0 --dry-run
-node packages/cli/dist/index.js openapi --spec examples/sample-openapi.json --dry-run
-node packages/cli/dist/index.js migrations --schema examples/sample.prisma --dry-run
 ```
 
-### GitHub Action
-See `examples/changelog-workflow.yml`. Add a `NOTION_TOKEN` secret and `NOTION_CHANGELOG_DB_ID` variable.
+### Deploy the Notion Worker
 
-### Notion Worker (bidirectional)
 ```bash
-cd packages/webhook-handler
-ntn workers deploy   # requires the Notion CLI (`ntn`), macOS/Linux only as of v0.14.0
+cd packages/ntn-agent-tools
+ntn login                                  # interactive (workspace governance must allow Worker tokens)
+ntn workers deploy --name flowsync-agent-tools
+ntn workers env push --yes                 # FLOWSYNC_* + GITHUB_TOKEN + NOTION_API_TOKEN
+ntn workers exec query_release -d '{"tag":"v21.2.0"}'                       # remote, runs on Notion's cloud
+ntn workers exec generate_changelog -d '{"repo":"angular/angular","tag":"v21.2.13","fromTag":"v21.2.12"}'
 ```
-See `packages/webhook-handler/README.md` for the full secret/config setup, and `docs/CLI-SETUP.md` for installing `ntn` (including the Windows + WSL workaround).
 
-### Custom Agent tools
+> Env vars use the `FLOWSYNC_` prefix because `NOTION_` is reserved (see issue #3). Notion calls use raw REST with `NOTION_API_TOKEN` because the injected client lacks `databases.query` (see issue #4).
+
+### Offline demo mode (zero internet)
+
 ```bash
-cd packages/agent-tools
-ntn workers deploy
+node demo/offline-replay.mjs   # → http://localhost:9090
 ```
-Then attach the worker as a tool source on your Custom Agent. See `packages/agent-tools/README.md`.
-
-## Collaboration features
-
-FlowSync is two-way. Highlights below; full list in `docs/COLLAB-FEATURES.md`.
-
-- **Release approval from Notion** — PMs flip a Status property, FlowSync publishes the GitHub release.
-- **Comment forwarding** — Notion comments on changelog rows appear as PR comments with backlinks.
-- **Edit-back to source** — editing `Description` / `Summary` / `Notes` on a synced row opens a labeled GitHub issue.
-- **Authors as Notion People** — `flowsync/people-map.json` maps GitHub logins to Notion user IDs.
-- **Auto-@mention on breaking changes** — a configured lead gets notified.
-- **Per-persona views** — Engineering / Product / Support read the same DB through three views.
-- **Synced blocks** — write once, surface in three places.
-- **Notion AI Q&A** — once the docs are in Notion, ask "what shipped in v1.4?" instead of pinging engineers.
-- **Linear ticket relations** — `ENG-1234` in commit messages flows to a Linear Tickets property.
-- **Custom Agent tools** — `generate_changelog`, `publish_release`, `sync_api_reference`, `query_release` callable from any agent.
-- **Architecture diagram sync (bidirectional)** — `notion-sync arch push` scans the package graph and writes a styled, color-coded Mermaid diagram into Notion that renders as a live diagram; `notion-sync arch scaffold` reads a diagram drawn in Notion and generates a prototype code skeleton (folders, stubs, wired deps). Design in Notion → code, or code → design doc.
-
-## Demo arc (Sunday 3:30 PM)
-
-1. Merge a PR with `feat!:` (breaking) and `(closes ENG-1234)` → push tag `v1.5.0`.
-2. GitHub Action fires → Notion Changelog row appears with toggles, PR links, breaking-change banner that **@mentions** the release lead, and a Linear Tickets cell.
-3. Co-founder opens the row, flips Status to `Approved for release`. The Notion Worker fires → real GitHub release appears 4 seconds later.
-4. Co-founder comments "this is great" on the row. PR #42 instantly gets a comment with backlink.
-5. Open your Notion Custom Agent, say "what's in v1.5?" → agent calls `query_release` → answers in chat.
-6. Ask: "sync the staging API spec" → agent calls `sync_api_reference` with the staging URL → API Reference DB updates live on screen.
-
-That's six platform primitives in one demo: Workers, webhooks, Custom Agents, external tools, database manipulation, AI Q&A.
+Mirrors the full demo arc from real captured responses and answers MCP at `POST /mcp` — the live demo command works offline by swapping the host.
 
 ## Architecture
 
-- `docs/ARCHITECTURE.md` — trigger → parse → diff → upsert flow.
-- `docs/DATABASE-SETUP.md` — required Notion DB schemas, per-persona views, Notion AI setup.
-- `docs/COLLAB-FEATURES.md` — the ten collaboration primitives.
-- `docs/CLI-SETUP.md` — installing `ntn`, Windows/WSL situation, and how `ntn` and FlowSync's own CLI relate.
-- `packages/webhook-handler/README.md` — deploying the Notion Worker.
-- `packages/agent-tools/README.md` — Custom Agent tool manifest.
+See `docs/ARCHITECTURE.md`. Trigger → parse → diff → upsert, bidirectional. The architecture diagram in Notion is generated from the package graph and renders natively as Mermaid; editing it scaffolds a code skeleton back (`notion-sync arch scaffold`).
+
+---
+
+*FlowSync · Notion Developer Platform Hackathon 2026 · `github.com/Kush614/Flowsync`*
