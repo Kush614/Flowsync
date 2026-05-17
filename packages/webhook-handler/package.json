@@ -1,0 +1,21 @@
+{
+  "name": "@flowsync/webhook-handler",
+  "version": "0.1.0",
+  "description": "Notion Worker that receives Notion webhook events and dispatches to GitHub.",
+  "type": "module",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean",
+    "dev:notion": "ntn workers dev",
+    "deploy:notion": "ntn workers deploy",
+    "dev:cf": "wrangler dev",
+    "deploy:cf": "wrangler deploy"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "wrangler": "^3.50.0"
+  }
+}

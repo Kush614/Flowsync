@@ -1,0 +1,23 @@
+{
+  "name": "@flowsync/agent-tools",
+  "version": "0.1.0",
+  "description": "Notion Custom Agent tool surface for FlowSync.",
+  "type": "module",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean",
+    "dev:notion": "ntn workers dev",
+    "deploy:notion": "ntn workers deploy",
+    "dev:cf": "wrangler dev --port 8788",
+    "deploy:cf": "wrangler deploy"
+  },
+  "dependencies": {
+    "@flowsync/core": "0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "wrangler": "^3.50.0"
+  }
+}

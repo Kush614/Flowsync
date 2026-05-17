@@ -1,0 +1,67 @@
+export interface ToolDefinition {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+}
+
+export const manifest: ToolDefinition[] = [
+  {
+    name: "generate_changelog",
+    description:
+      "Build a structured changelog entry by reading commits between two git refs from GitHub, then upsert it into the Notion Changelog database.",
+    inputSchema: {
+      type: "object",
+      required: ["repo", "tag"],
+      properties: {
+        repo: { type: "string", description: "GitHub repo in 'owner/repo' form" },
+        tag: { type: "string", description: "The new release tag, e.g. 'v1.4.0'" },
+        fromTag: {
+          type: "string",
+          description: "Optional previous tag to compare against. Defaults to the prior tag."
+        }
+      }
+    }
+  },
+  {
+    name: "publish_release",
+    description:
+      "Read a Notion changelog page and publish the corresponding GitHub release with the page's notes.",
+    inputSchema: {
+      type: "object",
+      required: ["pageId", "repo"],
+      properties: {
+        pageId: { type: "string", description: "Notion page ID of the changelog row" },
+        repo: { type: "string", description: "GitHub repo in 'owner/repo' form" },
+        draft: { type: "boolean", default: false }
+      }
+    }
+  },
+  {
+    name: "sync_api_reference",
+    description:
+      "Fetch an OpenAPI JSON spec from a URL and upsert each endpoint into the Notion API Reference database.",
+    inputSchema: {
+      type: "object",
+      required: ["specUrl"],
+      properties: {
+        specUrl: { type: "string", description: "Public URL to an OpenAPI 3.x JSON spec" }
+      }
+    }
+  },
+  {
+    name: "query_release",
+    description:
+      "Look up a release by tag in the Notion Changelog database and return a summary of features, fixes, and breaking changes.",
+    inputSchema: {
+      type: "object",
+      required: ["tag"],
+      properties: {
+        tag: { type: "string", description: "Release tag to look up, e.g. 'v1.4.0'" }
+      }
+    }
+  }
+];
+
+export function describeManifest(): { tools: ToolDefinition[] } {
+  return { tools: manifest };
+}

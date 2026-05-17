@@ -1,0 +1,25 @@
+name: Sync changelog to Notion
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: FlowSync changelog
+        uses: kush614/notion-flowsync/packages/github-action@v0.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          notion-token: ${{ secrets.NOTION_TOKEN }}
+          database-id: ${{ vars.NOTION_CHANGELOG_DB_ID }}

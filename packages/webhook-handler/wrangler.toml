@@ -1,0 +1,15 @@
+name = "flowsync-webhook"
+main = "src/index.ts"
+compatibility_date = "2024-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+NOTION_TO_GITHUB_REPO = "owner/repo"
+NOTION_RELEASE_STATUS_PROPERTY = "Status"
+NOTION_RELEASE_APPROVED_VALUE = "Approved for release"
+NOTION_WATCHED_DATABASE_IDS = ""
+
+# Secrets to set via `wrangler secret put <NAME>`:
+#   NOTION_WEBHOOK_VERIFICATION_TOKEN
+#   NOTION_TOKEN
+#   GITHUB_TOKEN

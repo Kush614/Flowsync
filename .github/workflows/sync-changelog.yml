@@ -1,0 +1,32 @@
+name: Sync changelog to Notion
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: FlowSync changelog
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_CHANGELOG_DB_ID: ${{ secrets.NOTION_CHANGELOG_DB_ID }}
+        run: |
+          node packages/cli/dist/index.js push \
+            --tag "${GITHUB_REF#refs/tags/}"

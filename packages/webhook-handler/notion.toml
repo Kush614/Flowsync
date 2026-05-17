@@ -1,0 +1,20 @@
+name = "flowsync-webhook"
+entry = "src/index.ts"
+runtime = "worker"
+
+[handler]
+type = "http"
+events = ["page.properties_updated", "page.content_updated", "comment.created"]
+
+[vars]
+NOTION_TO_GITHUB_REPO = "owner/repo"
+NOTION_RELEASE_STATUS_PROPERTY = "Status"
+NOTION_RELEASE_APPROVED_VALUE = "Approved for release"
+NOTION_WATCHED_DATABASE_IDS = ""
+
+[secrets]
+required = [
+  "NOTION_WEBHOOK_VERIFICATION_TOKEN",
+  "NOTION_TOKEN",
+  "GITHUB_TOKEN"
+]

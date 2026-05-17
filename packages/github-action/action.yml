@@ -1,0 +1,35 @@
+name: FlowSync Notion Changelog
+description: >-
+  Parse merged PRs / commits and upsert a structured release entry into a Notion changelog database.
+author: Kush Ise
+branding:
+  icon: book-open
+  color: blue
+
+inputs:
+  notion-token:
+    description: Notion integration token. Use ${{ secrets.NOTION_TOKEN }}.
+    required: true
+  database-id:
+    description: Notion database ID (with or without dashes) for the Changelog DB.
+    required: true
+  release-tag:
+    description: Release tag for this changelog entry. Defaults to github.ref_name on tag push.
+    required: false
+  base-ref:
+    description: Git ref to compare against. Defaults to the previous tag.
+    required: false
+  dry-run:
+    description: If true, print the payload but do not call the Notion API.
+    required: false
+    default: "false"
+
+outputs:
+  page-id:
+    description: The Notion page ID that was created or updated.
+  page-url:
+    description: URL of the updated changelog page.
+
+runs:
+  using: node20
+  main: dist/index.js

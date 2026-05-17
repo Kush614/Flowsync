@@ -1,0 +1,17 @@
+name = "flowsync-agent-tools"
+entry = "src/index.ts"
+runtime = "worker"
+
+[handler]
+type = "http"
+
+[agent_tools]
+manifest_path = "src/manifest.ts"
+
+[secrets]
+required = [
+  "NOTION_TOKEN",
+  "GITHUB_TOKEN",
+  "NOTION_CHANGELOG_DB_ID",
+  "NOTION_API_REFERENCE_DB_ID"
+]

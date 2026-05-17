@@ -1,0 +1,26 @@
+{
+  "name": "@flowsync/cli",
+  "version": "0.1.0",
+  "description": "FlowSync CLI: push docs from your terminal into Notion.",
+  "type": "module",
+  "bin": {
+    "notion-sync": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "tsc -b --clean",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@flowsync/core": "0.1.0",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.5",
+    "kleur": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "typescript": "^5.4.5"
+  }
+}

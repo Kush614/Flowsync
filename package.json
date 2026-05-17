@@ -1,0 +1,24 @@
+{
+  "name": "notion-flowsync",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Automated pipeline that turns engineering workflows into structured Notion documentation.",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "tsc --build --clean",
+    "format": "prettier --write \"packages/**/*.ts\"",
+    "action:bundle": "ncc build packages/github-action/src/index.ts -o packages/github-action/dist --source-map --license licenses.txt"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@vercel/ncc": "^0.38.1",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

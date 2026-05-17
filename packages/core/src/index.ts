@@ -1,0 +1,13 @@
+export { FlowSyncClient } from "./notion-client.js";
+export type { FlowSyncClientOptions } from "./notion-client.js";
+export { blocks } from "./block-builder.js";
+export { ChangelogUpserter } from "./upserts/changelog.js";
+export type { ChangelogEntry, ChangeItem, ChangelogUpserterOptions } from "./upserts/changelog.js";
+export { ApiReferenceUpserter } from "./upserts/api-reference.js";
+export type { ApiEndpointRecord } from "./upserts/api-reference.js";
+export { DataDictionaryUpserter } from "./upserts/data-dictionary.js";
+export type { TableRecord, ColumnRecord } from "./upserts/data-dictionary.js";
+export { parsePeopleMap, notionUsersFor } from "./people-map.js";
+export type { PeopleMap, PeopleMapFile } from "./people-map.js";
+export { createSyncedSource, referenceSynced } from "./synced-blocks.js";
+export { normalizeId } from "./util.js";

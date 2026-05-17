@@ -1,0 +1,7 @@
+export function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing env var ${name}. Add it to your .env or shell.`);
+  }
+  return value;
+}

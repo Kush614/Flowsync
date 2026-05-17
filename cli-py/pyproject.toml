@@ -1,0 +1,23 @@
+[project]
+name = "notion-flowsync"
+version = "0.1.0"
+description = "Python sibling CLI for the FlowSync Notion sync pipeline."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Kush Ise" }]
+license = { text = "MIT" }
+dependencies = [
+  "click>=8.1",
+  "notion-client>=2.2",
+  "python-dotenv>=1.0",
+]
+
+[project.scripts]
+notion-sync = "flowsync.cli:main"
+
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["flowsync"]

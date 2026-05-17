@@ -1,0 +1,17 @@
+{
+  "$schema": "Notion FlowSync project config",
+  "peopleMap": "./flowsync/people-map.json",
+  "changelog": {
+    "authorsProperty": "Authors",
+    "linearProperty": "Linear Tickets",
+    "syncedBlockPageId": null
+  },
+  "linear": {
+    "ticketPattern": "[A-Z]{2,8}-\\d{1,6}"
+  },
+  "webhook": {
+    "watchedDatabases": ["NOTION_CHANGELOG_DB_ID", "NOTION_API_REFERENCE_DB_ID"],
+    "releaseStatusProperty": "Status",
+    "releaseApprovedValue": "Approved for release"
+  }
+}
