@@ -146,11 +146,18 @@ export class ChangelogUpserter {
     return out;
   }
 
+  private static readonly MAX_PER_SECTION = 80;
+
   private section(title: string, items: ChangeItem[]): BlockObjectRequest {
-    return blocks.toggle(
-      `${title} (${items.length})`,
-      items.map((item) => blocks.bullet(this.formatItem(item), item.prUrl))
-    );
+    const cap = ChangelogUpserter.MAX_PER_SECTION;
+    const shown = items.slice(0, cap);
+    const children = shown.map((item) => blocks.bullet(this.formatItem(item), item.prUrl));
+    if (items.length > cap) {
+      children.push(
+        blocks.bullet(`…and ${items.length - cap} more ${title.toLowerCase()} in this release`)
+      );
+    }
+    return blocks.toggle(`${title} (${items.length})`, children);
   }
 
   private formatItem(item: ChangeItem): string {
